@@ -2,6 +2,6 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import '@/style.css'
 import 'element-plus/dist/index.css'
+import routrer from '@/router'
 
-const app = createApp(App)
-app.mount('#app')
+createApp(App).use(routrer).mount('#app')

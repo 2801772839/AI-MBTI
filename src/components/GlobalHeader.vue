@@ -35,6 +35,7 @@ import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {routes} from '@/router/routes'
 import {useLoginUserStore} from "@/store/userStore.ts";
+import checkAccess from "@/access/checkAccess.ts";
 
 const router = useRouter()
 const loginUserStore = useLoginUserStore()
@@ -52,7 +53,7 @@ const visibleRoutes = routes.filter(item => {
     return false
   }
   // 根据权限过滤菜单
-  
+  if(!checkAccess(loginUserStore.loginUserm,))
   return true
 })
 </script>

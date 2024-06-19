@@ -3,17 +3,32 @@ import { RouteRecordRaw } from 'vue-router'
 export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    name: '',
-    component: () => import('@/views/home.vue'),
-  },
-  {
-    path: '/home',
     name: '主页',
     component: () => import('@/views/home.vue'),
   },
-  // {
-  //   path: '*',
-  //   name: '404',
-  //   component: () => import('@/views/404.vue'), // 404 页面
-  // },
+  {
+    path: '/hide',
+    name: '主页',
+    component: () => import('@/views/home.vue'),
+    meta: {
+      hideInMenu: true,
+    },
+  },
+  {
+    path: '/home',
+    name: '第二',
+    component: () => import('@/views/home.vue'),
+  },
+  {
+    path: '/user',
+    name: '用户',
+    component: () => import('@/layouts/UserLayout.vue'),
+    children: [
+      {
+        path: '/user/login',
+        name: '登录',
+        component: () => import('@/views/home.vue'),
+      },
+    ],
+  },
 ]

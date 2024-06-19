@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview",
-    "openapi": "node openapi.config.ts"
+    "openapi": "ts-node openapi.config"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
@@ -17,6 +17,7 @@
     "less": "^4.2.0",
     "path": "^0.12.7",
     "pinia": "^2.1.7",
+    "ts-node": "^10.9.2",
     "vue": "^3.4.21",
     "vue-router": "^4.3.3"
   },

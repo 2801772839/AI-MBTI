@@ -1,33 +1,46 @@
 <template>
   <div id="basicLayout">
-    <el-container style="height: 100vh">
-      <el-header class="header"><GlobalHeader /></el-header>
-      <el-main class="content">
+    <a-layout style="height: 100vh">
+      <a-layout-header class="header">
+        <GlobalHeader />
+      </a-layout-header>
+      <a-layout-content class="content">
         <router-view />
-      </el-main>
-      <el-footer class="footer">Anysg</el-footer>
-    </el-container>
+      </a-layout-content>
+      <a-layout-footer class="footer">
+        <a href="https://www.code-nav.cn" target="_blank">
+          编程导航 by 程序员鱼皮
+        </a>
+      </a-layout-footer>
+    </a-layout>
   </div>
 </template>
 
-<script lang="ts" setup>
-import GlobalHeader from '@/components/GlobalHeader.vue'
+<script setup lang="ts">
+import GlobalHeader from "@/components/GlobalHeader.vue";
 </script>
-<style lang="less" scoped>
+
+<style scoped>
 #basicLayout {
-  .header {
-    margin-bottom: 16px;
-    box-shadow: #eee 1px 1px 5px;
-  }
-  .content {
-    background: linear-gradient(to right, #fefefe, #fff);
-    margin-bottom: 28px;
-    padding: 20px;
-  }
-  .footer {
-    background: #efefef;
-    padding: 16px;
-    text-align: center;
-  }
+}
+
+#basicLayout .header {
+  margin-bottom: 16px;
+  box-shadow: #eee 1px 1px 5px;
+}
+
+#basicLayout .content {
+  max-width: 1200px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto 28px;
+  padding: 20px;
+  background: linear-gradient(to right, #fefefe, #fff);
+}
+
+.footer {
+  padding: 16px;
+  text-align: center;
+  background: #efefef;
 }
 </style>

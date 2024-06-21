@@ -1,83 +1,91 @@
 <template>
-  <div id="globalHeader">
-    <el-row class="row">
-      <el-col :span="22">
-        <el-menu
-            :default-active="activeIndex"
-            mode="horizontal"
-            router
+  <a-row id="globalHeader" align="center" :wrap="false">
+    <a-col flex="auto">
+      <a-menu
+        mode="horizontal"
+        :selected-keys="selectedKeys"
+        @menu-item-click="doMenuClick"
+      >
+        <a-menu-item
+          key="0"
+          :style="{ padding: 0, marginRight: '38px' }"
+          disabled
         >
           <div class="titleBar">
-            <img src="@/assets/logo.png" class="logo" alt=""/>
-            <div class="title">AI答题</div>
+            <img class="logo" src="../assets/logo.png" />
+            <div class="title">鱼答答</div>
           </div>
-          <el-menu-item :index="item.path" v-for="item in visibleRoutes">
-            {{ item.name }}
-          </el-menu-item>
-        </el-menu>
-      </el-col>
-      <el-col :span="2">
-        <div v-if="loginUserStore.loginUser.id">
-          {{ loginUserStore.loginUser.userName ?? '匿名用户' }}
-        </div>
-        <div v-else>
-          <el-button type="primary" @click="login">登录</el-button>
-        </div>
-      </el-col>
-    </el-row>
-  </div>
+        </a-menu-item>
+        <a-menu-item v-for="item in visibleRoutes" :key="item.path">
+          {{ item.name }}
+        </a-menu-item>
+      </a-menu>
+    </a-col>
+    <a-col flex="100px">
+      <div v-if="loginUserStore.loginUser.id">
+        {{ loginUserStore.loginUser.userName ?? "无名" }}
+      </div>
+      <div v-else>
+        <a-button type="primary" href="/user/login">登录</a-button>
+      </div>
+    </a-col>
+  </a-row>
 </template>
 
-<script lang="ts" setup>
-import {computed, ref} from 'vue'
-import {useRouter} from 'vue-router'
-import {routes} from '@/router/routes'
-import {useLoginUserStore} from '@/store/userStore.ts'
-import checkAccess from '@/access/checkAccess.ts'
+<script setup lang="ts">
+import { routes } from "@/router/routes";
+import { useRouter } from "vue-router";
+import { computed, ref } from "vue";
+import { useLoginUserStore } from "@/store/userStore";
+import checkAccess from "@/access/checkAccess";
 
-const router = useRouter()
-const loginUserStore = useLoginUserStore()
-// 默认菜单项
-const activeIndex = ref('/')
+const loginUserStore = useLoginUserStore();
 
+const router = useRouter();
+// 当前选中的菜单项
+const selectedKeys = ref(["/"]);
+// 路由跳转时，自动更新选中的菜单项
+router.afterEach((to, from, failure) => {
+  selectedKeys.value = [to.path];
+});
+
+// 展示在菜单栏的路由数组
 const visibleRoutes = computed(() => {
-  return routes.filter(item => {
+  return routes.filter((item) => {
     if (item.meta?.hideInMenu) {
-      return false
+      return false;
     }
     // 根据权限过滤菜单
-    return checkAccess(loginUserStore.loginUser, item.meta?.access as string)
-  })
-})
-// 路由跳转时, 自动更新选中的菜单项
-router.afterEach(to => {
-  activeIndex.value = [to.path]
-})
-const login = () => {
-  router.push({path: '/user/login'})
-}
+    if (!checkAccess(loginUserStore.loginUser, item.meta?.access as string)) {
+      return false;
+    }
+    return true;
+  });
+});
+
+// 点击菜单跳转到对应页面
+const doMenuClick = (key: string) => {
+  router.push({
+    path: key,
+  });
+};
 </script>
-<style lang="less" scoped>
+
+<style scoped>
 #globalHeader {
-  .row {
-    align-items: center;
-    white-space: nowrap;
-  }
+}
 
-  .titleBar {
-    display: flex;
-    align-items: center;
+.titleBar {
+  display: flex;
+  align-items: center;
+}
 
-    .logo {
-      width: 40px;
-      height: 40px;
-      margin-right: 10px;
-    }
+.title {
+  margin-left: 16px;
+  color: black;
+}
 
-    .title {
-      font-size: 20px;
-      font-weight: bold;
-    }
-  }
+.logo {
+  height: 48px;
 }
 </style>

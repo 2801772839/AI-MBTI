@@ -1,103 +1,97 @@
 <template>
-  <el-form
-      :inline="true"
-      style="margin-bottom: 20px"
-      label-position="left"
-      :model="FormSearchParams"
-      label-width="auto"
-      status-icon
+  <a-form
+    :model="formSearchParams"
+    :style="{ marginBottom: '20px' }"
+    layout="inline"
+    @submit="doSearch"
   >
-    <el-form-item label="应用名称" prop="appName">
-      <el-input
-          v-model="FormSearchParams.appName"
-          placeholder="请输入应用名称"
+    <a-form-item field="appName" label="应用名称">
+      <a-input
+        v-model="formSearchParams.appName"
+        placeholder="请输入应用名称"
+        allow-clear
       />
-    </el-form-item>
-    <el-form-item label="应用描述" prop="appDesc">
-      <el-input
-          v-model="FormSearchParams.appDesc"
-          placeholder="请输入应用描述"
+    </a-form-item>
+    <a-form-item field="appDesc" label="应用描述">
+      <a-input
+        v-model="formSearchParams.appDesc"
+        placeholder="请输入应用描述"
+        allow-clear
       />
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary" @click="doSearch()" style="width: 100px">
+    </a-form-item>
+    <a-form-item>
+      <a-button type="primary" html-type="submit" style="width: 100px">
         搜索
-      </el-button>
-    </el-form-item>
-  </el-form>
-  <el-table :data="dataList" style="width: 100%" height="600">
-    <el-table-column prop="id" label="ID" width="180"/>
-    <el-table-column prop="appName" label="名称" width="180"/>
-    <el-table-column prop="appDesc" label="描述" width="180"/>
-    <el-table-column prop="appIcon" label="图标" width="180">
-      <template #default="{ row }">
-        <el-image
-            :src="row.appIcon"
-            style="width: 50px"
-        />
-      </template>
-    </el-table-column>
-    <el-table-column prop="appType" label="应用类型" width="180">
-      <template #default="{ row }">
-        {{ APP_TYPE_MAP[row.appType] }}
-      </template>
-    </el-table-column>
-    <el-table-column prop="scoringStrategy" label="评分策略" width="180">
-      <template #default="{ row }">
-        {{ APP_SCORING_STRATEGY_MAP[row.scoringStrategy] }}
-      </template>
-    </el-table-column>
-    <el-table-column prop="reviewStatus" label="审核状态" width="180">
-      <template #default="{ row }">
-        {{ REVIEW_STATUS_MAP[row.reviewStatus] }}
-      </template>
-    </el-table-column>
-    <el-table-column prop="reviewMessage" label="审核信息" width="180"/>
-    <el-table-column prop="reviewTime" label="审核时间" width="180"/>
-    <el-table-column prop="reviewerId" label="审核人 id" width="180"/>
-    <el-table-column prop="userId" label="用户 id" width="180"/>
-    <el-table-column prop="createTime" label="创建时间" width="180"/>
-    <el-table-column prop="updateTime" label="更新时间" width="180"/>
-    <el-table-column label="操作">
-      <template #default="{ row }">
-        <el-space>
-          <el-button
-              v-if="row.reviewStatus !== REVIEW_STATUS_ENUM.PASS"
-              status="success"
-              @click="doReview(row, REVIEW_STATUS_ENUM.PASS, '')"
-          >
-            通过
-          </el-button>
-          <el-button
-              v-if="row.reviewStatus !== REVIEW_STATUS_ENUM.REJECT"
-              status="warning"
-              @click="doReview(row, REVIEW_STATUS_ENUM.REJECT, '不符合上架要求')"
-          >
-            拒绝
-          </el-button>
-          <el-button status="danger" @click="handleDelete(row)">删除</el-button>
-        </el-space>
-      </template>
-    </el-table-column>
-  </el-table>
-  <div style="display: flex; justify-content: flex-end">
-    <el-pagination
-        :current-page="searchParams.current"
-        :page-size="searchParams.pageSize"
-        layout="total, prev, pager, next"
-        :total="parseInt(total)"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-    />
-  </div>
-
+      </a-button>
+    </a-form-item>
+  </a-form>
+  <a-table
+    :columns="columns"
+    :data="dataList"
+    :pagination="{
+      showTotal: true,
+      pageSize: searchParams.pageSize,
+      current: searchParams.current,
+      total,
+    }"
+    @page-change="onPageChange"
+  >
+    <template #appIcon="{ record }">
+      <a-image width="64" :src="record.appIcon" />
+    </template>
+    <template #appType="{ record }">
+      {{ APP_TYPE_MAP[record.appType] }}
+    </template>
+    <template #scoringStrategy="{ record }">
+      {{ APP_SCORING_STRATEGY_MAP[record.scoringStrategy] }}
+    </template>
+    <template #reviewStatus="{ record }">
+      {{ REVIEW_STATUS_MAP[record.reviewStatus] }}
+    </template>
+    <template #reviewTime="{ record }">
+      {{
+        record.reviewTime &&
+        dayjs(record.reviewTime).format("YYYY-MM-DD HH:mm:ss")
+      }}
+    </template>
+    <template #createTime="{ record }">
+      {{ dayjs(record.createTime).format("YYYY-MM-DD HH:mm:ss") }}
+    </template>
+    <template #updateTime="{ record }">
+      {{ dayjs(record.updateTime).format("YYYY-MM-DD HH:mm:ss") }}
+    </template>
+    <template #optional="{ record }">
+      <a-space>
+        <a-button
+          v-if="record.reviewStatus !== REVIEW_STATUS_ENUM.PASS"
+          status="success"
+          @click="doReview(record, REVIEW_STATUS_ENUM.PASS, '')"
+        >
+          通过
+        </a-button>
+        <a-button
+          v-if="record.reviewStatus !== REVIEW_STATUS_ENUM.REJECT"
+          status="warning"
+          @click="doReview(record, REVIEW_STATUS_ENUM.REJECT, '不符合上架要求')"
+        >
+          拒绝
+        </a-button>
+        <a-button status="danger" @click="doDelete(record)">删除</a-button>
+      </a-space>
+    </template>
+  </a-table>
 </template>
 
-<script lang="ts" setup>
-import {ref, watchEffect} from 'vue'
-import {ElMessage} from 'element-plus'
-import dayjs from 'dayjs'
-import {deleteAppUsingPost, doAppReviewUsingPost, listAppByPageUsingPost} from "@/api/appController.ts";
+<script setup lang="ts">
+import { ref, watchEffect } from "vue";
+import {
+  deleteAppUsingPost,
+  doAppReviewUsingPost,
+  listAppByPageUsingPost,
+} from "@/api/appController";
+import API from "@/api";
+import message from "@arco-design/web-vue/es/message";
+import { dayjs } from "@arco-design/web-vue/es/_utils/date";
 import {
   APP_SCORING_STRATEGY_MAP,
   APP_TYPE_MAP,
@@ -105,78 +99,72 @@ import {
   REVIEW_STATUS_MAP,
 } from "@/constant/app";
 
+const formSearchParams = ref<API.AppQueryRequest>({});
 
-const FormSearchParams = ref<API.AppQueryRequest>({})
-// 初始化查询参数(不应该被修改
+// 初始化搜索条件（不应该被修改）
 const initSearchParams = {
   current: 1,
   pageSize: 10,
-}
+};
+
 const searchParams = ref<API.AppQueryRequest>({
   ...initSearchParams,
-})
-const dataList = ref<API.User[]>([])
-const total = ref<number>(0)
-console.log('222222222222222')
+});
+const dataList = ref<API.App[]>([]);
+const total = ref<number>(0);
+
 /**
- *  加载数据
+ * 加载数据
  */
 const loadData = async () => {
-  const res = await listAppByPageUsingPost(searchParams.value)
+  const res = await listAppByPageUsingPost(searchParams.value);
   if (res.data.code === 0) {
-
-    dataList.value =
-        res.data.data?.records.map(item => ({
-          ...item,
-          createTime: dayjs(item.createTime).format('YYYY-MM-DD HH:mm'),
-          updateTime: dayjs(item.updateTime).format('YYYY-MM-DD HH:mm'),
-          reviewTime: dayjs(item.reviewTime).format('YYYY-MM-DD HH:mm'),
-        })) || []
-    total.value = res.data.data?.total || 0
+    dataList.value = res.data.data?.records || [];
+    total.value = res.data.data?.total || 0;
   } else {
-    ElMessage.error('获取数据失败' + res.data.message)
+    message.error("获取数据失败，" + res.data.message);
   }
-}
+};
+
 /**
- *  执行搜索
+ * 执行搜索
  */
 const doSearch = () => {
   searchParams.value = {
     ...initSearchParams,
-    ...FormSearchParams.value,
-  }
-}
+    ...formSearchParams.value,
+  };
+};
 
-
-const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`)
-}
 /**
- *  分页变化时 触发数据加载
- * @param val
+ * 当分页变化时，改变搜索条件，触发数据加载
+ * @param page
  */
-const handleCurrentChange = (val: number) => {
+const onPageChange = (page: number) => {
   searchParams.value = {
     ...searchParams.value,
-    current: val,
-  }
-}
+    current: page,
+  };
+};
+
 /**
  * 删除
- * @param row
+ * @param record
  */
-const handleDelete = async (row: API.App) => {
-  console.log(row.id)
-  if (!row.id) return
-  const res = await deleteAppUsingPost({
-    id: row.id,
-  })
-  if (res.data.code === 0) {
-    loadData()
-  } else {
-    ElMessage.error('删除数据失败' + res.data.message)
+const doDelete = async (record: API.App) => {
+  if (!record.id) {
+    return;
   }
-}
+
+  const res = await deleteAppUsingPost({
+    id: record.id,
+  });
+  if (res.data.code === 0) {
+    loadData();
+  } else {
+    message.error("删除失败，" + res.data.message);
+  }
+};
 
 /**
  * 审核
@@ -185,9 +173,9 @@ const handleDelete = async (row: API.App) => {
  * @param reviewMessage
  */
 const doReview = async (
-    record: API.App,
-    reviewStatus: number,
-    reviewMessage?: string
+  record: API.App,
+  reviewStatus: number,
+  reviewMessage?: string
 ) => {
   if (!record.id) {
     return;
@@ -201,16 +189,81 @@ const doReview = async (
   if (res.data.code === 0) {
     loadData();
   } else {
-    Elmessage.error("审核失败，" + res.data.message);
+    message.error("审核失败，" + res.data.message);
   }
 };
 
 /**
- *  监听searchParams 改变时触发数据的重新加载
+ * 监听 searchParams 变量，改变时触发数据的重新加载
  */
 watchEffect(() => {
-  loadData()
-})
-</script>
+  loadData();
+});
 
-<style></style>
+// 表格列配置
+const columns = [
+  {
+    title: "id",
+    dataIndex: "id",
+  },
+  {
+    title: "名称",
+    dataIndex: "appName",
+  },
+  {
+    title: "描述",
+    dataIndex: "appDesc",
+  },
+  {
+    title: "图标",
+    dataIndex: "appIcon",
+    slotName: "appIcon",
+  },
+  {
+    title: "应用类型",
+    dataIndex: "appType",
+    slotName: "appType",
+  },
+  {
+    title: "评分策略",
+    dataIndex: "scoringStrategy",
+    slotName: "scoringStrategy",
+  },
+  {
+    title: "审核状态",
+    dataIndex: "reviewStatus",
+    slotName: "reviewStatus",
+  },
+  {
+    title: "审核信息",
+    dataIndex: "reviewMessage",
+  },
+  {
+    title: "审核时间",
+    dataIndex: "reviewTime",
+    slotName: "reviewTime",
+  },
+  {
+    title: "审核人 id",
+    dataIndex: "reviewerId",
+  },
+  {
+    title: "用户 id",
+    dataIndex: "userId",
+  },
+  {
+    title: "创建时间",
+    dataIndex: "createTime",
+    slotName: "createTime",
+  },
+  {
+    title: "更新时间",
+    dataIndex: "updateTime",
+    slotName: "updateTime",
+  },
+  {
+    title: "操作",
+    slotName: "optional",
+  },
+];
+</script>

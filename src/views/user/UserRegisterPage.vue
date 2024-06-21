@@ -1,33 +1,33 @@
 <template>
   <div id="userRegisterPage">
     <h2 style="margin-bottom: 16px">用户注册</h2>
-    <el-form
-      style="width: 480px; margin: 0 auto"
-      label-position="left"
-      :model="Form"
-      label-width="auto"
-      class="demo-ruleForm"
-      status-icon
+    <a-form
+      :model="form"
+      :style="{ width: '480px', margin: '0 auto' }"
+      label-align="left"
+      auto-label-width
+      @submit="handleSubmit"
     >
-      <el-form-item label="用户名" prop="userAccount">
-        <el-input v-model="Form.userAccount" placeholder="请输入账号" />
-      </el-form-item>
-
-      <el-form-item label="密码" prop="userPassword" show-password>
-        <el-input
-          v-model="Form.userPassword"
+      <a-form-item field="userAccount" label="账号">
+        <a-input v-model="form.userAccount" placeholder="请输入账号" />
+      </a-form-item>
+      <a-form-item field="userPassword" tooltip="密码不小于 8 位" label="密码">
+        <a-input-password
+          v-model="form.userPassword"
           placeholder="请输入密码"
-          show-password
         />
-      </el-form-item>
-      <el-form-item label="确认密码" prop="checkPassword">
-        <el-input
-          v-model="Form.checkPassword"
-          placeholder="请再次输入密码"
-          show-password
+      </a-form-item>
+      <a-form-item
+        field="checkPassword"
+        tooltip="确认密码不小于 8 位"
+        label="确认密码"
+      >
+        <a-input-password
+          v-model="form.checkPassword"
+          placeholder="请输入确认密码"
         />
-      </el-form-item>
-      <el-form-item>
+      </a-form-item>
+      <a-form-item>
         <div
           style="
             display: flex;
@@ -36,58 +36,44 @@
             justify-content: space-between;
           "
         >
-          <el-button
-            type="primary"
-            @click="submitForm(Form)"
-            style="width: 120px"
-          >
+          <a-button type="primary" html-type="submit" style="width: 120px">
             注册
-          </el-button>
-          <el-button
-            @click="login"
-            :underline="false"
-            style="color: blueviolet"
-            link
-          >
-            老用户登录
-          </el-button>
+          </a-button>
+          <a-link href="/user/login">老用户登录</a-link>
         </div>
-      </el-form-item>
-    </el-form>
+      </a-form-item>
+    </a-form>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { reactive } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { userRegisterUsingPost } from '@/api/userController.ts'
+<script setup lang="ts">
+import { reactive } from "vue";
+import API from "@/api";
+import { userRegisterUsingPost } from "@/api/userController";
+import message from "@arco-design/web-vue/es/message";
+import { useRouter } from "vue-router";
 
-const router = useRouter()
+const router = useRouter();
 
-const Form = reactive({
-  userAccount: '',
-  userPassword: '',
-  checkPassword: '',
-} as API.UserRegisterRequest)
+const form = reactive({
+  userAccount: "",
+  userPassword: "",
+  checkPassword: "",
+} as API.UserRegisterRequest);
 
-const submitForm = async (Form: any) => {
-  const res = await userRegisterUsingPost(Form)
-  // console.log(res)
+/**
+ * 提交
+ */
+const handleSubmit = async () => {
+  const res = await userRegisterUsingPost(form);
   if (res.data.code === 0) {
-    ElMessage.success('注册成功')
+    message.success("注册成功");
     router.push({
-      path: '/user/login',
+      path: "/user/login",
       replace: true,
-    })
+    });
   } else {
-    ElMessage.error('注册失败' + res.data.message)
+    message.error("注册失败，" + res.data.message);
   }
-}
-const login = () => {
-  router.push({
-    path: '/user/login',
-    replace: true,
-  })
-}
+};
 </script>

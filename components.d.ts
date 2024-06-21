@@ -8,8 +8,12 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ',dVoewer': typeof import('./src/components/
+    AppCard: typeof import('./src/components/AppCard.vue')['default']
     copy: typeof import('./src/components/MdEditor copy.vue')['default']
+    ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElCard: typeof import('element-plus/es')['ElCard']
+    ElCardMeta: typeof import('element-plus/es')['ElCardMeta']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElCheckboxGroup: typeof import('element-plus/es')['ElCheckboxGroup']
     ElCol: typeof import('element-plus/es')['ElCol']
@@ -22,9 +26,13 @@ declare module 'vue' {
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElHeader: typeof import('element-plus/es')['ElHeader']
     ElIcon: typeof import('element-plus/es')['ElIcon']
+    ElIconShare: typeof import('@element-plus/icons-vue')['Share']
+    ElIconThumbUp: typeof import('@element-plus/icons-vue')['ThumbUp']
     ElImage: typeof import('element-plus/es')['ElImage']
     ElInput: typeof import('element-plus/es')['ElInput']
+    ElInputSearch: typeof import('element-plus/es')['ElInputSearch']
     ElLink: typeof import('element-plus/es')['ElLink']
+    ElList: typeof import('element-plus/es')['ElList']
     ElMain: typeof import('element-plus/es')['ElMain']
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
@@ -44,6 +52,7 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTimePicker: typeof import('element-plus/es')['ElTimePicker']
+    ElTypographyText: typeof import('element-plus/es')['ElTypographyText']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     GlobalHeader: typeof import('./src/components/GlobalHeader.vue')['default']
     MdEditor: typeof import('./src/components/MdEditor.vue')['default']
@@ -52,5 +61,6 @@ declare module 'vue' {
     PictureUploader: typeof import('./src/components/PictureUploader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ShareModal: typeof import('./src/components/ShareModal.vue')['default']
   }
 }

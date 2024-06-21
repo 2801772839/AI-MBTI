@@ -2,28 +2,45 @@
   <div id="userLoginPage">
     <h2 style="margin-bottom: 16px">用户登录</h2>
     <el-form
-        style="width: 480px ;margin: 0 auto"
-        label-position="left"
-        :model="Form"
-        label-width="auto"
-        class="demo-ruleForm"
-        status-icon
+      style="width: 480px; margin: 0 auto"
+      label-position="left"
+      :model="Form"
+      label-width="auto"
+      class="demo-ruleForm"
+      status-icon
     >
       <el-form-item label="用户名" prop="userAccount">
-        <el-input v-model="Form.userAccount" placeholder="请输入账号"/>
+        <el-input v-model="Form.userAccount" placeholder="请输入账号" />
       </el-form-item>
       <el-form-item label="密码" prop="userPassword">
-        <el-input v-model="Form.userPassword" placeholder="请输入密码" show-password/>
+        <el-input
+          v-model="Form.userPassword"
+          placeholder="请输入密码"
+          show-password
+        />
       </el-form-item>
       <el-form-item>
-        <div style="display: flex;
-                  width:100%;
-                  align-items: center;
-                  justify-content: space-between;">
-          <el-button type="primary" @click="submitForm(Form)" style="width: 120px">
+        <div
+          style="
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <el-button
+            type="primary"
+            @click="submitForm(Form)"
+            style="width: 120px"
+          >
             登录
           </el-button>
-          <el-button @click="register" :underline="false" style="color: blueviolet" link>
+          <el-button
+            @click="register"
+            :underline="false"
+            style="color: blueviolet"
+            link
+          >
             新用户注册
           </el-button>
         </div>
@@ -33,20 +50,26 @@
 </template>
 
 <script lang="ts" setup>
-import {reactive} from 'vue'
-import {userLoginUsingPost} from "@/api/userController.ts";
-import {useLoginUserStore} from "@/store/userStore.ts";
-import {ElMessage} from "element-plus";
-import {useRouter} from "vue-router";
+import { reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { userLoginUsingPost } from '@/api/userController.ts'
+import { useLoginUserStore } from '@/store/userStore.ts'
 
-const loginUserStore = useLoginUserStore()
 const router = useRouter()
+const loginUserStore = useLoginUserStore()
+
 const Form = reactive({
   userAccount: '',
   userPassword: '',
 } as API.UserLoginRequest)
 
-
+const register = () => {
+  router.push({
+    path: '/user/register',
+    replace: true,
+  })
+}
 const submitForm = async (Form: any) => {
   const res = await userLoginUsingPost(Form)
   // console.log(res)
@@ -54,19 +77,11 @@ const submitForm = async (Form: any) => {
     await loginUserStore.fetchLoginUser()
     ElMessage.success('登录成功')
     router.push({
-      path: "/",
-      replace: true
+      path: '/',
+      replace: true,
     })
   } else {
-    ElMessage.error("登录失败" + res.data.message)
+    ElMessage.error('登录失败' + res.data.message)
   }
 }
-const register = () => {
-  router.push({
-    path: "/user/register",
-    replace: true
-  })
-}
-
-
 </script>

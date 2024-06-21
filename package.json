@@ -10,9 +10,13 @@
     "openapi": "ts-node openapi.config"
   },
   "dependencies": {
+    "@bytemd/plugin-gfm": "^1.21.0",
+    "@bytemd/plugin-highlight": "^1.21.0",
+    "@bytemd/vue-next": "^1.21.0",
     "@element-plus/icons-vue": "^2.3.1",
     "@umijs/openapi": "^1.12.1",
     "axios": "^1.7.2",
+    "dayjs": "^1.11.11",
     "element-plus": "^2.7.5",
     "less": "^4.2.0",
     "path": "^0.12.7",

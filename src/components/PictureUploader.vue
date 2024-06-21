@@ -1,104 +1,113 @@
 <template>
-  <a-space direction="vertical" :style="{ width: '100%' }">
-    <a-upload
-      :fileList="file ? [file] : []"
+  <el-space>
+    <el-upload
+      class="avatar-uploader"
+      :file-list="file ? [file] : []"
+      action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
       :show-file-list="false"
-      :custom-request="customRequest"
+      :on-success="handleAvatarSuccess"
+      :before-upload="beforeAvatarUpload"
+      :on-progress="customRequest"
     >
-      <template #upload-button>
-        <div
-          :class="`arco-upload-list-item${
-            file && file.status === 'error'
-              ? ' arco-upload-list-item-error'
-              : ''
-          }`"
-        >
-          <div
-            class="arco-upload-list-picture custom-upload-avatar"
-            v-if="file && file.url"
-          >
-            <img :src="file.url" />
-            <div class="arco-upload-list-picture-mask">
-              <IconEdit />
-            </div>
-            <a-progress
-              v-if="file.status === 'uploading' && file.percent < 100"
-              :percent="file.percent"
-              type="circle"
-              size="mini"
-              :style="{
-                position: 'absolute',
-                left: '50%',
-                top: '50%',
-                transform: 'translateX(-50%) translateY(-50%)',
-              }"
-            />
-          </div>
-          <div class="arco-upload-picture-card" v-else>
-            <div class="arco-upload-picture-card-text">
-              <IconPlus />
-              <div style="margin-top: 10px; font-weight: 600">上传</div>
-            </div>
-          </div>
-        </div>
-      </template>
-    </a-upload>
-  </a-space>
+      <img :src="file.url" class="avatar" alt="" />
+      <el-icon class="avatar-uploader-icon">
+        <Plus />
+      </el-icon>
+    </el-upload>
+  </el-space>
 </template>
 
 <script setup lang="ts">
-import { IconEdit, IconPlus } from "@arco-design/web-vue/es/icon";
-import { ref, withDefaults, defineProps } from "vue";
-import { uploadFileUsingPost } from "@/api/fileController";
-import { Message } from "@arco-design/web-vue";
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
+import type { UploadProps } from 'element-plus'
+import { uploadFileUsingPost } from '@/api/fileController.ts'
 
 /**
  * 定义组件属性类型
  */
 interface Props {
-  biz: string;
-  onChange?: (url: string) => void;
-  value?: string;
+  biz: string
+  onChange?: (url: string) => void
+  value?: string
 }
 
 /**
  * 给组件指定初始值
  */
 const props = withDefaults(defineProps<Props>(), {
-  value: () => "",
-});
+  value: () => '',
+})
 
-const file = ref();
+const file = ref()
 if (props.value) {
   file.value = {
     url: props.value,
     percent: 100,
-    status: "done",
-  };
+    status: 'done',
+  }
+}
+const handleAvatarSuccess: UploadProps['onSuccess'] = (
+  response,
+  uploadFile
+) => {
+  imageUrl.value = URL.createObjectURL(uploadFile.raw!)
 }
 
-// 自定义请求
+const beforeAvatarUpload: UploadProps['beforeUpload'] = rawFile => {
+  if (rawFile.type !== 'image/jpeg') {
+    ElMessage.error('Avatar picture must be JPG format!')
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error('Avatar picture size can not exceed 2MB!')
+    return false
+  }
+  return true
+}
 const customRequest = async (option: any) => {
-  const { onError, onSuccess, fileItem } = option;
+  const { onError, onSuccess, fileItem } = option
 
   const res: any = await uploadFileUsingPost(
     { biz: props.biz },
     {},
     fileItem.file
-  );
+  )
   if (res.data.code === 0 && res.data.data) {
-    const url = res.data.data;
+    const url = res.data.data
     file.value = {
       name: fileItem.name,
       file: fileItem.file,
       url,
-    };
-    props.onChange?.(url);
-    onSuccess();
-    console.log(file.value);
+    }
+    props.onChange?.(url)
+    onSuccess()
+    console.log(file.value)
   } else {
-    Message.error("上传失败，" + res.data.message || "");
-    onError(new Error(res.data.message));
+    ElMessage.error('上传失败，' + res.data.message || '')
+    onError(new Error(res.data.message))
   }
-};
+}
 </script>
+<style>
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+}
+</style>

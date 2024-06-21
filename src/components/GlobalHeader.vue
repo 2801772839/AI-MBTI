@@ -4,13 +4,11 @@
       <el-col :span="22">
         <el-menu
             :default-active="activeIndex"
-            class="el-menu-demo"
             mode="horizontal"
-            @select="handleSelect"
-            router="true"
+            router
         >
           <div class="titleBar">
-            <img src="@/assets/logo.png" alt="" class="logo"/>
+            <img src="@/assets/logo.png" class="logo" alt=""/>
             <div class="title">AI答题</div>
           </div>
           <el-menu-item :index="item.path" v-for="item in visibleRoutes">
@@ -20,10 +18,10 @@
       </el-col>
       <el-col :span="2">
         <div v-if="loginUserStore.loginUser.id">
-          {{ loginUserStore.loginUser.userName ?? "匿名用户" }}
+          {{ loginUserStore.loginUser.userName ?? '匿名用户' }}
         </div>
         <div v-else>
-          <el-button type="primary">登录</el-button>
+          <el-button type="primary" @click="login">登录</el-button>
         </div>
       </el-col>
     </el-row>
@@ -31,31 +29,33 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {computed, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {routes} from '@/router/routes'
-import {useLoginUserStore} from "@/store/userStore.ts";
-import checkAccess from "@/access/checkAccess.ts";
+import {useLoginUserStore} from '@/store/userStore.ts'
+import checkAccess from '@/access/checkAccess.ts'
 
 const router = useRouter()
 const loginUserStore = useLoginUserStore()
-// 菜单项
-const activeIndex = ref(['/'])
+// 默认菜单项
+const activeIndex = ref('/')
+
+const visibleRoutes = computed(() => {
+  return routes.filter(item => {
+    if (item.meta?.hideInMenu) {
+      return false
+    }
+    // 根据权限过滤菜单
+    return checkAccess(loginUserStore.loginUser, item.meta?.access as string)
+  })
+})
 // 路由跳转时, 自动更新选中的菜单项
 router.afterEach(to => {
   activeIndex.value = [to.path]
 })
-const handleSelect = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
+const login = () => {
+  router.push({path: '/user/login'})
 }
-const visibleRoutes = routes.filter(item => {
-  if (item.meta?.hideInMenu) {
-    return false
-  }
-  // 根据权限过滤菜单
-  if(!checkAccess(loginUserStore.loginUserm,))
-  return true
-})
 </script>
 <style lang="less" scoped>
 #globalHeader {
